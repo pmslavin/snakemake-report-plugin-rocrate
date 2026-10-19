@@ -12,6 +12,7 @@ from snakemake_interface_common.exceptions import WorkflowError
 def validate_rocrate(
     rocrate_uri: str | Path,
     requirement_severity: models.Severity | str = models.Severity.REQUIRED,
+    validate_metadata_only: bool = False
 ) -> None:
     """Validate a crate against Provenance Run Crate 0.5."""
     if isinstance(requirement_severity, str):
@@ -43,10 +44,28 @@ def validate_rocrate(
         identifiers = sorted(check.identifier for check in incomplete)
         raise WorkflowError(f"RO-Crate validation checks did not complete: {identifiers}")
     if result.has_issues():
-        message = "RO-Crate is invalid!\n" + "\n".join(
-            f"Detected issue of severity {issue.severity.name} with check "
-            f'"{issue.check.identifier}": {issue.message}'
-            for issue in result.get_issues()
-        )
-        raise WorkflowError(message)
+        issues = result.get_issues()
+        if validate_metadata_only:
+            # Discard unwanted validation issues
+            import re
+            override_patterns = {
+                re.compile(r"^Main Workflow .* not found in crate$"),
+                re.compile(r"^The RO-Crate does not include the Data Entity .* as part of its payload$")
+            }
+            report_issues = []
+            for issue in issues:
+                for pattern in override_patterns:    # NB. for-else
+                    if re.match(pattern, issue.message):
+                        break
+                else:
+                    report_issues.append(issue)
+        else:
+            report_issues = issues
+        if len(report_issues) > 0:
+            message = "RO-Crate is invalid!\n" + "\n".join(
+                f"Detected issue of severity {issue.severity.name} with check "
+                f'"{issue.check.identifier}": {issue.message}'
+                for issue in report_issues
+            )
+            raise WorkflowError(message)
     snakemake_logger.info("RO-Crate validation succeeded for profile provenance-run-crate-0.5.")
