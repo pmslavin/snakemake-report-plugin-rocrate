@@ -141,8 +141,8 @@ class ReportSettings(ReportSettingsBase):  # type: ignore[misc]
         metadata={
             "help": "Create only the ro-create-metadata.json file.",
             "env_var": False,
-            "required": False
-        }
+            "required": False,
+        },
     )
 
 
@@ -173,5 +173,5 @@ class Reporter(ReporterBase):  # type: ignore[misc]
             validate_rocrate(
                 crate_path,
                 requirement_severity=self.settings.validation_severity,
-                validate_metadata_only=self.settings.output_only_metadata
+                validate_metadata_only=self.settings.output_only_metadata,
             )

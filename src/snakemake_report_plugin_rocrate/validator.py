@@ -12,7 +12,7 @@ from snakemake_interface_common.exceptions import WorkflowError
 def validate_rocrate(
     rocrate_uri: str | Path,
     requirement_severity: models.Severity | str = models.Severity.REQUIRED,
-    validate_metadata_only: bool = False
+    validate_metadata_only: bool = False,
 ) -> None:
     """Validate a crate against Provenance Run Crate 0.5."""
     if isinstance(requirement_severity, str):
@@ -48,13 +48,16 @@ def validate_rocrate(
         if validate_metadata_only:
             # Discard unwanted validation issues
             import re
+
             override_patterns = {
                 re.compile(r"^Main Workflow .* not found in crate$"),
-                re.compile(r"^The RO-Crate does not include the Data Entity .* as part of its payload$")
+                re.compile(
+                    r"^The RO-Crate does not include the Data Entity .* as part of its payload$"
+                ),
             }
             report_issues = []
             for issue in issues:
-                for pattern in override_patterns:    # NB. for-else
+                for pattern in override_patterns:  # NB. for-else
                     if re.match(pattern, issue.message):
                         break
                 else:

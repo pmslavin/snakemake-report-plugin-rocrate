@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 import warnings
-
 from importlib.metadata import version
 from pathlib import Path
 from typing import Any
@@ -73,10 +72,12 @@ class ProvenanceRunCrateBuilder:
             # This isn't a real detached crate, so discard warning
             # as to required filename prefix for detached form
             with warnings.catch_warnings(record=True):
-                warnings.filterwarnings("ignore",
-                                        module="rocrate",
-                                        category=UserWarning,
-                                        message=".*should follow the pattern.*")
+                warnings.filterwarnings(
+                    "ignore",
+                    module="rocrate",
+                    category=UserWarning,
+                    message=".*should follow the pattern.*",
+                )
                 self.crate.write_detached(crate_path)
             return crate_path
         else:
