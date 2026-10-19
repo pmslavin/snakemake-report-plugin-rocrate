@@ -130,6 +130,11 @@ entity and can be used even when no ROR identifier is supplied.
 Sets the organization's website URL. It is recorded directly from the supplied
 value without making a network request.
 
+### `output-only-metadata`
+
+Outputs a single file `ro-crate-metadata.json` equivalent to that which would
+otherwise be accompanied by data entities in a Zip container.
+
 ## Running the examples
 
 ### Linear-elastic plate with a hole
